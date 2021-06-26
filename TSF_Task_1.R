@@ -1,0 +1,44 @@
+library(ggplot2)
+library(ggthemes)
+library(dplyr)
+library(corrgram)
+library(corrplot)
+df<-read.csv(file.choose(),sep=";")
+num.cols<-sapply(df,is.numeric)
+cor.data<-cor(df[,num.cols])
+cor.data
+df
+print(corrplot(cor.data,method='color'))
+corrgram(df)
+corrgram(df,order=T,lower.panel = panel.shade,upper.panel = panel.pie,text.panel = panel.txt)
+install.packages('caTools')
+library(caTools)
+set.seed(101)
+sample<-sample.split(df$G3,SplitRatio = 0.7)
+train<-subset(df,sample==T)
+test<-subset(df,sample=F)
+model<-lm(G3~.,train)
+summary(model)
+res<-residuals(model)
+res<-as.data.frame(res)
+head(res)
+ggplot(res,aes(res))+geom_histogram(fill='blue',alphs=0.5)
+plot(model)
+G3.predictions<-predict(model,test)
+results<-cbind(G3.predictions,test$G3)
+colnames(results)<-c('predicted','actual')
+results<-as.data.frame(results)
+head(results)
+to_zero<-function(x){
+  if(x<0){return(0)}
+  else{return(x)}
+}
+min(results)
+results$predicted<-sapply(results$predicted,to_zero)
+mse<-mean((results$actual-results$predicted)^2)
+mse
+mse^0.5
+SSE<-sum((results$predicted-results$actual)^2)
+SST<-sum((mean(df$G3)-results$actual)^2)
+R2<-1-SSE/SST
+R2
