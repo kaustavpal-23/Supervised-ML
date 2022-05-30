@@ -1,5 +1,5 @@
 # Supervised-ML
-This was one of my first projects in Machine Learning
+Basic implementation of Linear Regression, a Supervised ML Algorithm, more importantnly a statistical method.
 
 Tool used: **R**
 
